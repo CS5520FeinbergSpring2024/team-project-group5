@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Paw Pals Group 5</string>
+    <string name="username">username</string>
+    <string name="password">password</string>
+    <string name="login">Login</string>
+    <string name="no_account_register_here">No account? Register here</string>
+    <string name="welcome_to_pawpals">Welcome to PawPals!</string>
+    <string name="register">Register</string>
+    <string name="join_pawpals_now">Join PawPals now!</string>
 </resources>
