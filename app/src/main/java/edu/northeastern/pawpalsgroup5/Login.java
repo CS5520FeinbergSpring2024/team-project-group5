@@ -9,35 +9,69 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class Login extends AppCompatActivity {
+import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.regex.Pattern;
+
+public class Login extends AppCompatActivity {
+    FirebaseAuth myAuth = FirebaseAuth.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        EditText usernameEditText = findViewById(R.id.usernameEditText);
+        EditText emailEditText = findViewById(R.id.emailEditText);
         EditText passwordEditText = findViewById(R.id.passwordEditText);
         Button loginButton = findViewById(R.id.loginButton);
         TextView registerTextLinkView = findViewById(R.id.registerLinkTextView);
 
         loginButton.setOnClickListener(view -> {
-            // TODO: add authentication logic here before navigating to main
-            String username = usernameEditText.getText().toString();
+
+            String email = emailEditText.getText().toString();
             String password = passwordEditText.getText().toString();
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(Login.this, "Username and password cannot be empty.", Toast.LENGTH_SHORT).show();
                 return;
             }
+            if (!validateEmail(email)) {
+                emailEditText.setError("Invalid email format");
+                Toast.makeText(getApplicationContext(), "Invalid email format", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            myAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            // Sign in success, navigate to Main Activity
+                            Intent intent = new Intent(Login.this, MainActivity.class);
+                            startActivity(intent);
+                        } else {
+                            // If sign in fails, show the user authentication failed
+                            Toast.makeText(Login.this, "Authentication failed. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
-            Intent intent = new Intent(Login.this, MainActivity.class);
-            startActivity(intent);
         });
 
         registerTextLinkView.setOnClickListener(view -> {
             Intent intent = new Intent(Login.this, Register.class);
             startActivity(intent);
         });
+    }
+    private boolean validateEmail(String email) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+
+        Pattern pattern = Pattern.compile(emailRegex);
+        if (email == null)
+            return false;
+        return pattern.matcher(email).matches();
+    }
+
+    private boolean validatePassword(String password) {
+        if (password.length() < 6) {
+            Toast.makeText(Login.this, "Password must be at least 6 characters.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 }
