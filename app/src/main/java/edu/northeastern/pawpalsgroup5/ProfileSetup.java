@@ -59,5 +59,14 @@ public class ProfileSetup extends AppCompatActivity {
                 Toast.makeText(ProfileSetup.this, "User authentication required.", Toast.LENGTH_SHORT).show();
             }
         });
+
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        btnLogout.setOnClickListener(view -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(ProfileSetup.this, Login.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        });
     }
 }
