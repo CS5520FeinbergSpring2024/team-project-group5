@@ -7,4 +7,14 @@
     <string name="welcome_to_pawpals">Welcome to PawPals!</string>
     <string name="register">Register</string>
     <string name="join_pawpals_now">Join PawPals now!</string>
+    <string name="home">Home</string>
+    <string name="following">Following</string>
+    <string name="post">Post</string>
+    <string name="me">Me</string>
+    <string name="settings">Settings</string>
+    <string name="post_image">Post Image</string>
+    <string name="like">Like</string>
+    <string name="follow">Follow</string>
+    <string name="content_placeholder">Fragment Section: %1$d</string>
+
 </resources>
