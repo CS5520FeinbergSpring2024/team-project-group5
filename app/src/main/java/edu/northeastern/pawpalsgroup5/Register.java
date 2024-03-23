@@ -46,7 +46,7 @@ public class Register extends AppCompatActivity {
                             // Sign in success, get the current user
                             FirebaseUser user = myAuth.getCurrentUser();
                             // Redirect to main page
-                            Intent intent = new Intent(Register.this, MainActivity.class);
+                            Intent intent = new Intent(Register.this, ProfileSetup.class);
                             startActivity(intent);
                         } else {
                             Toast.makeText(Register.this, "Authentication failed. Please try again.",

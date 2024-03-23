@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/user_default"
+    />
+
+    <Button
+        android:id="@+id/btnChangeProfilePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="Upload"/>
+
+    <EditText
+        android:id="@+id/petNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Pet Name"
+        android:inputType="textPersonName"
+        android:layout_marginTop="16dp"/>
+
+    <EditText
+        android:id="@+id/breedEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Breed"
+        android:inputType="textPersonName"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/ageEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Age"
+        android:inputType="textPersonName"
+        android:layout_marginTop="8dp"/>
+
+    <EditText
+        android:id="@+id/introductionEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tell Paw Pals More About Yourself"
+        android:inputType="textMultiLine"
+        android:lines="4"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btnSaveProfile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>
