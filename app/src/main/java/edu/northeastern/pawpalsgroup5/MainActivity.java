@@ -1,5 +1,6 @@
 package edu.northeastern.pawpalsgroup5;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,30 +31,30 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_me) {
+                selectedFragment = new ProfileFragment();
+            } else if (itemId == R.id.nav_home) {
+                selectedFragment = PlaceholderFragment.newInstance(1);
 
-//            switch (item.getItemId()) {
-//                case R.id.nav_home:
-//                    selectedFragment = PlaceholderFragment.newInstance(1);
-//                    break;
-//                case R.id.nav_following:
-//                    selectedFragment = PlaceholderFragment.newInstance(2);
-//                    break;
-//                case R.id.nav_post:
-//                    selectedFragment = PlaceholderFragment.newInstance(3);
-//                    break;
-//                case R.id.nav_me:
-//                    selectedFragment = PlaceholderFragment.newInstance(4);
-//                    break;
-//                case R.id.nav_settings:
-//                    selectedFragment = PlaceholderFragment.newInstance(5);
-//                    break;
-//            }
+            } else if (itemId == R.id.nav_following) {
+                selectedFragment = PlaceholderFragment.newInstance(2);
 
+            } else if(itemId == R.id.nav_post) {
+                selectedFragment = PlaceholderFragment.newInstance(3);
+
+            } else if(itemId == R.id.nav_settings) {
+                selectedFragment = new ProfileSetupFragment();
+
+            }
             if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, selectedFragment)
+                        .commit();
+                return true;
             }
 
-            return true; // Indicate that the item selection has been handled
+            return true;
         }
     };
 }
