@@ -39,13 +39,15 @@ public class ProfileSetup extends AppCompatActivity {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
                 String userId = currentUser.getUid();
-                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users");
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
 
                 HashMap<String, Object> userData = new HashMap<>();
                 userData.put("petName", petName);
                 userData.put("breed", breed);
                 userData.put("age", age);
                 userData.put("description", description);
+                userData.put("following", 0);
+                userData.put("follower", 0);
 
                 databaseRef.child(userId).setValue(userData)
                         .addOnSuccessListener(unused -> {
