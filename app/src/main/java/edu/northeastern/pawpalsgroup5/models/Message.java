@@ -15,7 +15,7 @@ public class Message {
         this.text = text;
         this.timestamp = timestamp;
     }
-    
+
     public String getSenderId() {
         return senderId;
     }

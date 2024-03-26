@@ -12,6 +12,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.HashMap;
+
+import edu.northeastern.pawpalsgroup5.models.User;
+
 public class ProfileSetup extends AppCompatActivity {
 
     @Override
@@ -39,20 +42,12 @@ public class ProfileSetup extends AppCompatActivity {
             FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
             if (currentUser != null) {
                 String userId = currentUser.getUid();
-                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users");
 
-                HashMap<String, Object> userData = new HashMap<>();
-                userData.put("petName", petName);
-                userData.put("breed", breed);
-                userData.put("age", age);
-                userData.put("description", description);
-                userData.put("following", 0);
-                userData.put("follower", 0);
-
-                databaseRef.child(userId).setValue(userData)
+                User user = new User(age, breed, description, petName);
+                databaseRef.child(userId).setValue(user)
                         .addOnSuccessListener(unused -> {
                             Toast.makeText(ProfileSetup.this, "Profile information saved successfully.", Toast.LENGTH_SHORT).show();
-
                             Intent intent = new Intent(ProfileSetup.this, MainActivity.class);
                             startActivity(intent);
                         })
