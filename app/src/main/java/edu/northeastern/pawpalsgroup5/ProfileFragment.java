@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import edu.northeastern.pawpalsgroup5.models.User;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -86,16 +87,13 @@ public class ProfileFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        String petName = dataSnapshot.child("petName").getValue(String.class);
-                        String breed = dataSnapshot.child("breed").getValue(String.class);
-                        String age = dataSnapshot.child("age").getValue(String.class); // Firebase stores integers as Long
-                        String description = dataSnapshot.child("description").getValue(String.class);
-
-                        // Update the EditText fields
-                        ((TextView) view.findViewById(R.id.usernameTextView)).setText(petName);
-                        ((TextView) view.findViewById(R.id.BreedTextView)).setText(breed);
-                        ((TextView) view.findViewById(R.id.AgeTextView)).setText(age);
-                        ((TextView) view.findViewById(R.id.introTextView)).setText(description);
+                        User user = dataSnapshot.getValue(User.class);
+                        if(user != null) {
+                            ((TextView) view.findViewById(R.id.usernameTextView)).setText(user.getPetName());
+                            ((TextView) view.findViewById(R.id.BreedTextView)).setText(user.getBreed());
+                            ((TextView) view.findViewById(R.id.AgeTextView)).setText(user.getAge());
+                            ((TextView) view.findViewById(R.id.introTextView)).setText(user.getDescription());
+                        }
                     }
                 }
 
