@@ -1,8 +1,10 @@
 package edu.northeastern.pawpalsgroup5.models;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class User {
     private String age;
@@ -10,15 +12,15 @@ public class User {
     private String description;
     private String petName;
     private Map<String, Boolean> chatRefs;
-    private List<String>  followers;
-    private List<String> following;
+    private Set<String>  followers;
+    private Set<String> following;
     private String picture;
     private String username;
 
     public User() {
         this.chatRefs = new HashMap<>();
-        this.followers = new ArrayList<>();
-        this.following = new ArrayList<>();
+        this.followers = new HashSet<>();
+        this.following = new HashSet<>();
     }
 
     public User(String age, String breed, String description, String petName) {
@@ -30,8 +32,8 @@ public class User {
     }
 
     public User(String age, String breed, String description, String petName,
-                Map<String, Boolean> chatRefs, List<String> followers,
-                List<String> following, String picture, String username) {
+                Map<String, Boolean> chatRefs, Set<String> followers,
+                Set<String> following, String picture, String username) {
         this.age = age;
         this.breed = breed;
         this.description = description;
@@ -84,19 +86,19 @@ public class User {
         this.chatRefs = chatRefs;
     }
 
-    public List<String> getFollowers() {
+    public Set<String> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(List<String> followers) {
+    public void setFollowers(Set<String> followers) {
         this.followers = followers;
     }
 
-    public List<String>getFollowing() {
+    public Set<String>getFollowing() {
         return following;
     }
 
-    public void setFollowing(List<String> following) {
+    public void setFollowing(Set<String> following) {
         this.following = following;
     }
 
