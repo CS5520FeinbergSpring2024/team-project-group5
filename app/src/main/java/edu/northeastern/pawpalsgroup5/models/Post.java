@@ -7,17 +7,19 @@ public class Post {
     private long timestamp;
     private String userId;
     private String postId;
+    private String username;
 
     public Post() {
     }
 
-    public Post(String description, int likes, String picture, long timestamp, String userId,String postId) {
+    public Post(String description, int likes, String picture, long timestamp, String userId,String postId, String username) {
         this.description = description;
         this.likes = likes;
         this.picture = picture;
         this.timestamp = timestamp;
         this.userId = userId;
         this.postId = postId;
+        this.username = username;
     }
 
     public String getDescription() {
@@ -38,6 +40,9 @@ public class Post {
 
     public String getUserId() {
         return userId;
+    }
+    public String getUsername() {
+        return username;
     }
     public String getPostId() {return postId;}
 
