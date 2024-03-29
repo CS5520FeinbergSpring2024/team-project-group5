@@ -36,7 +36,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         Post post = posts.get(position);
 
         holder.descriptionTextView.setText(post.getDescription());
-        holder.usernameTextView.setText(post.getUserId());
+        holder.usernameTextView.setText(post.getUsername());
         holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
         // handle image loading
 //        Glide.with(context).load(post.getPicture()).into(holder.profileImageView);
@@ -45,9 +45,9 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             // Increment the like count in the model
             post.setLikes(post.getLikes() + 1);
             holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
-
+            holder.likeImageView.setImageResource(R.drawable.paw_black);
             // Update the like count in Firebase
-            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("posts").child(post.getPostId()); // Ensure you have a postId or similar unique identifier
+            DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("posts").child(post.getPostId());
             postRef.child("likes").setValue(post.getLikes()).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
                     post.setLikes(post.getLikes() - 1);
@@ -69,6 +69,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView numLikeTextView;
         TextView usernameTextView;
         TextView descriptionTextView;
+        ImageView followImageView;
 
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +79,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             numLikeTextView = itemView.findViewById(R.id.numLikeTextView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
+            followImageView = itemView.findViewById(R.id.followImageView);
         }
     }
 }
