@@ -24,5 +24,8 @@
     <string name="camera">camera</string>
     <string name="description">description</string>
     <string name="select">select</string>
+    <string name="sent_message">Sent message</string>
+    <string name="timestamp">Timestamp</string>
+    <string name="received_message">Received message</string>
 
 </resources>
