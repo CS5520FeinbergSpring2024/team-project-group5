@@ -56,8 +56,8 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = PlaceholderFragment.newInstance(2);
 
             } else if(itemId == R.id.nav_post) {
-                selectedFragment = PlaceholderFragment.newInstance(3);
-
+                Intent intent = new Intent(MainActivity.this, PostActivity.class);
+                startActivity(intent);
             } else if(itemId == R.id.nav_settings) {
                 selectedFragment = new ProfileSetupFragment();
 
