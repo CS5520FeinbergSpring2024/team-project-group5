@@ -1,4 +1,6 @@
 package edu.northeastern.pawpalsgroup5.models;
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,28 +14,30 @@ public class User {
     private String description;
     private String petName;
     private Map<String, Boolean> chatRefs;
-    private Set<String>  followers;
-    private Set<String> following;
+    private List<String>  followers;
+    private List<String> following;
     private String picture;
     private String username;
 
+
     public User() {
         this.chatRefs = new HashMap<>();
-        this.followers = new HashSet<>();
-        this.following = new HashSet<>();
+        this.followers = new ArrayList<>();
+        this.following = new ArrayList<>();
     }
 
-    public User(String age, String breed, String description, String petName) {
+    public User(String age, String breed, String description, String petName, String picture) {
         this();
         this.age = age;
         this.breed = breed;
         this.description = description;
         this.petName = petName;
+        this.picture = picture;
     }
 
     public User(String age, String breed, String description, String petName,
-                Map<String, Boolean> chatRefs, Set<String> followers,
-                Set<String> following, String picture, String username) {
+                Map<String, Boolean> chatRefs, List<String> followers,
+                List<String> following, String picture, String username) {
         this.age = age;
         this.breed = breed;
         this.description = description;
@@ -86,19 +90,19 @@ public class User {
         this.chatRefs = chatRefs;
     }
 
-    public Set<String> getFollowers() {
+    public List<String> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(Set<String> followers) {
+    public void setFollowers(List<String> followers) {
         this.followers = followers;
     }
 
-    public Set<String>getFollowing() {
+    public List<String>getFollowing() {
         return following;
     }
 
-    public void setFollowing(Set<String> following) {
+    public void setFollowing(List<String> following) {
         this.following = following;
     }
 
