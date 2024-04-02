@@ -48,9 +48,6 @@ public class ProfileSetupFragment extends Fragment {
 
     FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-    private ActivityResultLauncher<String> mGetContent;
-
-
 
     public ProfileSetupFragment() {
         // Required empty public constructor
@@ -120,7 +117,7 @@ public class ProfileSetupFragment extends Fragment {
                     Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             } else {
-                Toast.makeText(requireContext(), "Please select an image to upload.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "User authentication required", Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -98,7 +98,7 @@ public class ProfileSetup extends AppCompatActivity {
                     Toast.makeText(ProfileSetup.this, "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             } else {
-                Toast.makeText(ProfileSetup.this, "Please select an image to upload.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileSetup.this, "User authentication required", Toast.LENGTH_SHORT).show();
             }
         });
 
