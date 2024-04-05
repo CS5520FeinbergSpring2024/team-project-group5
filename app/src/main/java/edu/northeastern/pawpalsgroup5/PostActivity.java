@@ -15,10 +15,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 
 public class PostActivity extends AppCompatActivity {
 
@@ -102,9 +109,48 @@ public class PostActivity extends AppCompatActivity {
 
     private void uploadPost() {
         final String description = postDescriptionEditText.getText().toString().trim();
-        if (photoURI == null || description.isEmpty()) {
-            Toast.makeText(this, "Image or description is missing", Toast.LENGTH_SHORT).show();
+
+        if (description.isEmpty()) {
+            Toast.makeText(this, "Please enter a description for your post.", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (photoURI != null) {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+
+            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+            String fileName = "JPEG_" + timeStamp + "_";
+            StorageReference imageRef = storageRef.child("images/" + fileName);
+
+            imageRef.putFile(photoURI).addOnSuccessListener(taskSnapshot -> {
+                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String imageUrl = uri.toString();
+                    savePostToDatabase(imageUrl, description);
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(PostActivity.this, "Failed to get image URL.", Toast.LENGTH_SHORT).show();
+                });
+            }).addOnFailureListener(e -> {
+                Toast.makeText(PostActivity.this, "Image upload failed.", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            savePostToDatabase("", description); // Pass an empty string for imageUrl
+        }
+    }
+
+    private void savePostToDatabase(String imageUrl, String description) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference postsRef = database.getReference("posts");
+
+        String postId = postsRef.push().getKey();
+
+        HashMap<String, Object> post = new HashMap<>();
+        post.put("imageUrl", imageUrl);
+        post.put("description", description);
+
+        postsRef.child(postId).setValue(post).addOnSuccessListener(aVoid -> {
+            Toast.makeText(PostActivity.this, "Post uploaded successfully.", Toast.LENGTH_SHORT).show();
+        }).addOnFailureListener(e -> {
+            Toast.makeText(PostActivity.this, "Failed to save post to database.", Toast.LENGTH_SHORT).show();
+        });
     }
 }
