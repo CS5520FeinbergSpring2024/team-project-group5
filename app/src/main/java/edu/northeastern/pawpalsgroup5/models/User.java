@@ -1,8 +1,12 @@
 package edu.northeastern.pawpalsgroup5.models;
+import android.net.Uri;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class User {
     private String age;
@@ -15,18 +19,20 @@ public class User {
     private String picture;
     private String username;
 
+
     public User() {
         this.chatRefs = new HashMap<>();
         this.followers = new ArrayList<>();
         this.following = new ArrayList<>();
     }
 
-    public User(String age, String breed, String description, String petName) {
+    public User(String age, String breed, String description, String petName, String picture) {
         this();
         this.age = age;
         this.breed = breed;
         this.description = description;
         this.petName = petName;
+        this.picture = picture;
     }
 
     public User(String age, String breed, String description, String petName,
