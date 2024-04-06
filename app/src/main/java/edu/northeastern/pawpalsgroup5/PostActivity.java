@@ -1,18 +1,22 @@
 package edu.northeastern.pawpalsgroup5;
 
+import android.Manifest;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -77,8 +81,38 @@ public class PostActivity extends AppCompatActivity {
         likesCount = getIntent().getIntExtra("likesCount", 0);
 
         selectImageButton.setOnClickListener(view -> openGallery());
-        captureImageButton.setOnClickListener(view -> dispatchTakePictureIntent());
+        captureImageButton.setOnClickListener(view -> {
+            if (checkAndRequestPermissions()) {
+                dispatchTakePictureIntent();
+            }
+        });
         postButton.setOnClickListener(view -> uploadPost());
+    }
+
+    private boolean checkAndRequestPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults.length > 0) {
+                boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
+                if (cameraAccepted && writeStorageAccepted) {
+                    dispatchTakePictureIntent();
+                } else {
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
     }
 
     private void openGallery() {
@@ -88,10 +122,20 @@ public class PostActivity extends AppCompatActivity {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        try{
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, "No camera app available", Toast.LENGTH_SHORT).show();
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                if (photoFile != null) {
+                    photoURI = FileProvider.getUriForFile(this,
+                            "your.package.name.fileprovider",
+                            photoFile);
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                }
+            } catch (IOException ex) {
+                Toast.makeText(this, "Could not create file for the photo", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
