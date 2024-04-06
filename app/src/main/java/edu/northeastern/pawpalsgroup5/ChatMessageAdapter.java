@@ -3,10 +3,14 @@ package edu.northeastern.pawpalsgroup5;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import edu.northeastern.pawpalsgroup5.models.Message;
 import java.util.List;
 import java.util.Date;
@@ -26,9 +30,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public int getItemViewType(int position) {
         Message message = messages.get(position);
         if (message.getSenderId().equals(currUserId)) {
-            return 1; // sent message
+            return 1;
         } else {
-            return 2; // received message
+            return 2;
         }
     }
 
@@ -36,12 +40,11 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        // sent message
         if (viewType == 1) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.sent_message_item, parent, false);
             return new SentMessageHolder(view);
-        } else { // received message
+        } else {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.received_message_item, parent, false);
             return new ReceivedMessageHolder(view);
@@ -85,19 +88,24 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     }
 
     private static class ReceivedMessageHolder extends RecyclerView.ViewHolder {
-        TextView messageText, timeText;
+        TextView senderName, messageText, timeText;
+        ImageView senderProfilePicture;
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
+            senderName = itemView.findViewById(R.id.senderName);
             messageText = itemView.findViewById(R.id.received_message_body);
             timeText = itemView.findViewById(R.id.received_message_time);
+            senderProfilePicture = itemView.findViewById(R.id.profilePicture);
         }
 
         void bind(Message message) {
+            senderName.setText(message.getSenderId());
             messageText.setText(message.getText());
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
             String formattedDate = dateFormat.format(new Date(message.getTimestamp()));
             timeText.setText(formattedDate);
+            Glide.with(itemView.getContext()).load(message.getSenderProfilePictureUrl()).into(senderProfilePicture);
         }
     }
 }
