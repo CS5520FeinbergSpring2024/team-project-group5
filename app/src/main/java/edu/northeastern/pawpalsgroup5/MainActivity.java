@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Create an intent to start the ChatHistoryActivity
-                Intent intent = new Intent(MainActivity.this, Chat.class);
+                Intent intent = new Intent(MainActivity.this, ChatHistoryActivity.class); // Modified to ChatHistoryActivity
                 startActivity(intent);
             }
         });

@@ -3,9 +3,12 @@ package edu.northeastern.pawpalsgroup5;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,12 +16,15 @@ import android.provider.MediaStore;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -26,12 +32,17 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Objects;
 
 public class PostActivity extends AppCompatActivity {
 
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
     private ImageView postImageView;
     private EditText postDescriptionEditText;
     private Uri photoURI;
+    private int likesCount;
+    private static final int REQUEST_PERMISSION = 1;
+
 
     ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -55,11 +66,15 @@ public class PostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
+
         postImageView = findViewById(R.id.postImageView);
         postDescriptionEditText = findViewById(R.id.postDescriptionEditText);
         Button selectImageButton = findViewById(R.id.selectImageButton);
         Button captureImageButton = findViewById(R.id.captureImageButton);
         Button postButton = findViewById(R.id.postButton);
+
+
+        likesCount = getIntent().getIntExtra("likesCount", 0);
 
         selectImageButton.setOnClickListener(view -> openGallery());
         captureImageButton.setOnClickListener(view -> dispatchTakePictureIntent());
@@ -73,43 +88,26 @@ public class PostActivity extends AppCompatActivity {
 
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            File photoFile = null;
-            try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
-                Toast.makeText(this, "Error creating file", Toast.LENGTH_SHORT).show();
-            }
-
-            if (photoFile != null) {
-                photoURI = FileProvider.getUriForFile(this,
-                        "edu.northeastern.pawpalsgroup5.fileprovider",
-                        photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                cameraLauncher.launch(takePictureIntent);
-            }
+        try{
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(this, "No camera app available", Toast.LENGTH_SHORT).show();
         }
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
+        return File.createTempFile(
                 imageFileName,
                 ".jpg",
                 storageDir
         );
-
-
-        return image;
     }
 
     private void uploadPost() {
         final String description = postDescriptionEditText.getText().toString().trim();
-
         if (description.isEmpty()) {
             Toast.makeText(this, "Please enter a description for your post.", Toast.LENGTH_SHORT).show();
             return;
@@ -133,19 +131,24 @@ public class PostActivity extends AppCompatActivity {
                 Toast.makeText(PostActivity.this, "Image upload failed.", Toast.LENGTH_SHORT).show();
             });
         } else {
-            savePostToDatabase("", description); // Pass an empty string for imageUrl
+            savePostToDatabase("", description);
         }
     }
 
-    private void savePostToDatabase(String imageUrl, String description) {
+    private void savePostToDatabase(String picture, String description) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference postsRef = database.getReference("posts");
 
         String postId = postsRef.push().getKey();
+        long timestamp = new Date().getTime();
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         HashMap<String, Object> post = new HashMap<>();
-        post.put("imageUrl", imageUrl);
+        post.put("picture", picture);
         post.put("description", description);
+        post.put("likes", likesCount);
+        post.put("timestamp", timestamp);
+        post.put("userId", userId);
 
         postsRef.child(postId).setValue(post).addOnSuccessListener(aVoid -> {
             Toast.makeText(PostActivity.this, "Post uploaded successfully.", Toast.LENGTH_SHORT).show();
