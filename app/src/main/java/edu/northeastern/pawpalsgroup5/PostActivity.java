@@ -1,123 +1,63 @@
 package edu.northeastern.pawpalsgroup5;
 
-import android.Manifest;
-
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.UUID;
+
+import edu.northeastern.pawpalsgroup5.models.Post;
 
 public class PostActivity extends AppCompatActivity {
 
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
     private ImageView postImageView;
     private EditText postDescriptionEditText;
     private Uri photoURI;
-    private int likesCount;
-    private static final int REQUEST_PERMISSION = 1;
+    private String currentPhotoPath;
 
-
-    ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
-                    Uri selectedImage = result.getData().getData();
-                    postImageView.setImageURI(selectedImage);
-                }
-            });
-
-    ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-                    postImageView.setImageURI(photoURI);
-                }
-            });
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
 
-
         postImageView = findViewById(R.id.postImageView);
         postDescriptionEditText = findViewById(R.id.postDescriptionEditText);
+
         Button selectImageButton = findViewById(R.id.selectImageButton);
         Button captureImageButton = findViewById(R.id.captureImageButton);
         Button postButton = findViewById(R.id.postButton);
 
-
-        likesCount = getIntent().getIntExtra("likesCount", 0);
-
         selectImageButton.setOnClickListener(view -> openGallery());
-        captureImageButton.setOnClickListener(view -> {
-            if (checkAndRequestPermissions()) {
-                dispatchTakePictureIntent();
-            }
-        });
-        postButton.setOnClickListener(view -> uploadPost());
-    }
-
-    private boolean checkAndRequestPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_PERMISSION) {
-            if (grantResults.length > 0) {
-                boolean cameraAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
-                boolean writeStorageAccepted = grantResults[1] == PackageManager.PERMISSION_GRANTED;
-                if (cameraAccepted && writeStorageAccepted) {
-                    dispatchTakePictureIntent();
-                } else {
-                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
+        captureImageButton.setOnClickListener(view -> dispatchTakePictureIntent());
+        postButton.setOnClickListener(view -> sendPost());
     }
 
     private void openGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        galleryLauncher.launch(intent);
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, 2);
     }
 
     private void dispatchTakePictureIntent() {
@@ -126,15 +66,13 @@ public class PostActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-                if (photoFile != null) {
-                    photoURI = FileProvider.getUriForFile(this,
-                            "your.package.name.fileprovider",
-                            photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
             } catch (IOException ex) {
-                Toast.makeText(this, "Could not create file for the photo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error occurred while creating the file", Toast.LENGTH_SHORT).show();
+            }
+            if (photoFile != null) {
+                photoURI = FileProvider.getUriForFile(this, "edu.northeastern.pawpalsgroup5.provider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             }
         }
     }
@@ -143,61 +81,63 @@ public class PostActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(
+        File image = File.createTempFile(
                 imageFileName,
                 ".jpg",
                 storageDir
         );
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
-    private void uploadPost() {
-        final String description = postDescriptionEditText.getText().toString().trim();
-        if (description.isEmpty()) {
-            Toast.makeText(this, "Please enter a description for your post.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (photoURI != null) {
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference();
-
-            String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-            String fileName = "JPEG_" + timeStamp + "_";
-            StorageReference imageRef = storageRef.child("images/" + fileName);
-
-            imageRef.putFile(photoURI).addOnSuccessListener(taskSnapshot -> {
-                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                    String imageUrl = uri.toString();
-                    savePostToDatabase(imageUrl, description);
-                }).addOnFailureListener(e -> {
-                    Toast.makeText(PostActivity.this, "Failed to get image URL.", Toast.LENGTH_SHORT).show();
-                });
-            }).addOnFailureListener(e -> {
-                Toast.makeText(PostActivity.this, "Image upload failed.", Toast.LENGTH_SHORT).show();
-            });
+    private void sendPost() {
+        String description = postDescriptionEditText.getText().toString().trim();
+        if (photoURI != null && !description.isEmpty()) {
+            uploadImageToFirebase(photoURI, description);
         } else {
-            savePostToDatabase("", description);
+            Toast.makeText(this, "Please select an image and write a description.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void savePostToDatabase(String picture, String description) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference postsRef = database.getReference("posts");
+    private void uploadImageToFirebase(Uri imageUri, String description) {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("postImages/" + UUID.randomUUID().toString());
+        storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+            storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
+                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                if (currentUser != null) {
+                    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("posts");
+                    String postId = databaseRef.push().getKey();
 
-        String postId = postsRef.push().getKey();
-        long timestamp = new Date().getTime();
-        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    long timestamp = System.currentTimeMillis();
+                    Post post = new Post(description, 0, downloadUri.toString(), timestamp, currentUser.getUid(), postId, "Username");
 
-        HashMap<String, Object> post = new HashMap<>();
-        post.put("picture", picture);
-        post.put("description", description);
-        post.put("likes", likesCount);
-        post.put("timestamp", timestamp);
-        post.put("userId", userId);
+                    databaseRef.child(postId).child("description").setValue(post.getDescription());
+                    databaseRef.child(postId).child("likes").setValue(post.getLikes());
+                    databaseRef.child(postId).child("picture").setValue(post.getPicture());
+                    databaseRef.child(postId).child("timestamp").setValue(post.getTimestamp());
+                    databaseRef.child(postId).child("userId").setValue(post.getUserId());
 
-        postsRef.child(postId).setValue(post).addOnSuccessListener(aVoid -> {
-            Toast.makeText(PostActivity.this, "Post uploaded successfully.", Toast.LENGTH_SHORT).show();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(PostActivity.this, "Failed to save post to database.", Toast.LENGTH_SHORT).show();
-        });
+
+                    Toast.makeText(PostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(PostActivity.this, "User authentication is required", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> Toast.makeText(PostActivity.this, "Failed to get image URL", Toast.LENGTH_SHORT).show());
+        }).addOnFailureListener(e -> Toast.makeText(PostActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show());
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            postImageView.setImageURI(photoURI);
+        } else if (requestCode == 2 && resultCode == RESULT_OK) {
+            photoURI = data.getData();
+            postImageView.setImageURI(photoURI);
+        }
     }
 }
+
+
