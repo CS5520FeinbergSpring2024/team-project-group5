@@ -6,10 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -38,8 +41,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.descriptionTextView.setText(post.getDescription());
         holder.usernameTextView.setText(post.getUsername());
         holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
-        // handle image loading
-//        Glide.with(context).load(post.getPicture()).into(holder.profileImageView);
+        holder.usernameTextView.setText(post.getUsername());
+        holder.likeImageView.setImageResource(R.drawable.paw_white);
+        Picasso.get()
+                .load(post.getProfilePicture())
+                .into(holder.profileImageView);
+
+        Picasso.get()
+                .load(post.getPicture())
+                .into(holder.postImageView);
 
         holder.likeImageView.setOnClickListener(v -> {
             // Increment the like count in the model
@@ -64,6 +74,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
     static class FeedViewHolder extends RecyclerView.ViewHolder {
         ImageView profileImageView;
+        ImageView postImageView;
         ImageView likeImageView;
         ImageView chatImageView;
         TextView numLikeTextView;
@@ -80,6 +91,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             numLikeTextView = itemView.findViewById(R.id.numLikeTextView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
             followImageView = itemView.findViewById(R.id.followImageView);
+            postImageView = itemView.findViewById(R.id.postImageView);
         }
     }
 }
