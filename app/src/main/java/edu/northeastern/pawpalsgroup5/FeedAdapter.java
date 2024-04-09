@@ -22,6 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import edu.northeastern.pawpalsgroup5.models.Post;
@@ -49,6 +53,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
         holder.usernameTextView.setText(post.getUsername());
         holder.likeImageView.setImageResource(R.drawable.paw_white);
+        long timestamp = post.getTimestamp();
+        ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+
+        holder.timestampTextView.setText(dateTime.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+
         Picasso.get()
                 .load(post.getProfilePicture())
                 .into(holder.profileImageView);
@@ -61,7 +70,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             // Increment the like count in the model
             post.setLikes(post.getLikes() + 1);
             holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
-            holder.likeImageView.setImageResource(R.drawable.paw_black);
             // Update the like count in Firebase
             DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("posts").child(post.getPostId());
             postRef.child("likes").setValue(post.getLikes()).addOnCompleteListener(task -> {
@@ -139,6 +147,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView usernameTextView;
         TextView descriptionTextView;
         ImageView followImageView;
+        TextView timestampTextView;
 
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -150,6 +159,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
             followImageView = itemView.findViewById(R.id.followImageView);
             postImageView = itemView.findViewById(R.id.postImageView);
+            timestampTextView = itemView.findViewById(R.id.timestampTextView);
         }
 
     }
