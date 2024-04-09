@@ -9,13 +9,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 import edu.northeastern.pawpalsgroup5.models.Message;
-import java.util.List;
-import java.util.Date;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<Message> messages;
@@ -80,10 +79,21 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         }
 
         void bind(Message message) {
-            messageText.setText(message.getText());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
-            String formattedDate = dateFormat.format(new Date(message.getTimestamp()));
-            timeText.setText(formattedDate);
+            if (message.getText() != null) {
+                messageText.setText(message.getText());
+            } else {
+                // if message is null
+                messageText.setText("");
+            }
+
+            if (message.getTimestamp() > 0) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+                String formattedDate = dateFormat.format(new Date(message.getTimestamp()));
+                timeText.setText(formattedDate);
+            } else {
+                // if timestamp is not valid
+                timeText.setText("");
+            }
         }
     }
 
@@ -93,19 +103,25 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         ReceivedMessageHolder(View itemView) {
             super(itemView);
-            senderName = itemView.findViewById(R.id.senderName);
             messageText = itemView.findViewById(R.id.received_message_body);
             timeText = itemView.findViewById(R.id.received_message_time);
             senderProfilePicture = itemView.findViewById(R.id.profilePicture);
         }
 
         void bind(Message message) {
-            senderName.setText(message.getSenderId());
-            messageText.setText(message.getText());
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
-            String formattedDate = dateFormat.format(new Date(message.getTimestamp()));
-            timeText.setText(formattedDate);
-            Glide.with(itemView.getContext()).load(message.getSenderProfilePictureUrl()).into(senderProfilePicture);
+            if (message.getText() != null) {
+                messageText.setText(message.getText());
+            } else {
+                messageText.setText("");
+            }
+
+            if (message.getTimestamp() > 0) {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault());
+                String formattedDate = dateFormat.format(new Date(message.getTimestamp()));
+                timeText.setText(formattedDate);
+            } else {
+                timeText.setText("");
+            }
         }
     }
 }
