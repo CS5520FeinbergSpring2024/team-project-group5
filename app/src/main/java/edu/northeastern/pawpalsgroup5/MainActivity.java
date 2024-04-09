@@ -72,4 +72,16 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     };
+
+    public void switchToProfileFragment(String userId) {
+        ProfileFragment profileFragment = new ProfileFragment();
+        Bundle args = new Bundle();
+        args.putString("userId", userId);
+        profileFragment.setArguments(args);
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, profileFragment)
+                .commit();
+
+    }
 }

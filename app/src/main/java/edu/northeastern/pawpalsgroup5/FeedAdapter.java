@@ -2,6 +2,7 @@ package edu.northeastern.pawpalsgroup5;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,6 +79,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
 
             openChat(v.getContext(), postUserId, otherUserName, otherUserProfilePic);
         });
+
+        holder.profileImageView.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).switchToProfileFragment(post.getUserId());
+            }
+        });
     }
 
     @Override
@@ -143,5 +151,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             followImageView = itemView.findViewById(R.id.followImageView);
             postImageView = itemView.findViewById(R.id.postImageView);
         }
+
     }
 }
