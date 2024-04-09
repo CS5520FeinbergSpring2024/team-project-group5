@@ -23,9 +23,9 @@ public class MainActivity extends AppCompatActivity {
         BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);
         bottomNav.setOnItemSelectedListener(navListener);
 
-        // Load the default PlaceholderFragment when the activity is first created
+        // Load the default FeedFragment when the activity is first created
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, PlaceholderFragment.newInstance(1)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FeedFragment()).commit();
         }
 
         // Find the chat history button by its ID
@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == R.id.nav_me) {
                 selectedFragment = new ProfileFragment();
             } else if (itemId == R.id.nav_home) {
-                selectedFragment = PlaceholderFragment.newInstance(1);
+                selectedFragment = new FeedFragment();
 
             } else if (itemId == R.id.nav_following) {
                 selectedFragment = PlaceholderFragment.newInstance(2);

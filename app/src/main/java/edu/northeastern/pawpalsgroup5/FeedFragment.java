@@ -52,7 +52,11 @@ public class FeedFragment extends Fragment {
                 postList.clear(); // Clear the old data
                 for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
                     Post post = postSnapshot.getValue(Post.class);
-                    postList.add(post);
+                    if (post != null) {
+                        post.setPostId(postSnapshot.getKey().toString());  // Setting the postId
+                        Log.d("POSTID", "postid" + post.getPostId());
+                        postList.add(post);
+                    }
                 }
                 feedAdapter.notifyDataSetChanged();
             }

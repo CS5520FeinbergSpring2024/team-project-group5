@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,8 +17,11 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -106,20 +110,44 @@ public class PostActivity extends AppCompatActivity {
             storageRef.getDownloadUrl().addOnSuccessListener(downloadUri -> {
                 FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
                 if (currentUser != null) {
-                    DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("posts");
-                    String postId = databaseRef.push().getKey();
 
-                    long timestamp = System.currentTimeMillis();
-                    Post post = new Post(description, 0, downloadUri.toString(), timestamp, currentUser.getUid(), postId, "Username");
+                    DatabaseReference databaseRefUser = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid());
 
-                    databaseRef.child(postId).child("description").setValue(post.getDescription());
-                    databaseRef.child(postId).child("likes").setValue(post.getLikes());
-                    databaseRef.child(postId).child("picture").setValue(post.getPicture());
-                    databaseRef.child(postId).child("timestamp").setValue(post.getTimestamp());
-                    databaseRef.child(postId).child("userId").setValue(post.getUserId());
+                    databaseRefUser.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                String pictureUrl = dataSnapshot.child("picture").getValue(String.class);
+                                String username = dataSnapshot.child("petName").getValue(String.class);
+                                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("posts");
+                                String postId = databaseRef.push().getKey();
+
+                                long timestamp = System.currentTimeMillis();
+                                Post post = new Post(description, 0, downloadUri.toString(), timestamp, currentUser.getUid(), postId, username, pictureUrl);
+
+                                databaseRef.child(postId).child("description").setValue(post.getDescription());
+                                databaseRef.child(postId).child("likes").setValue(post.getLikes());
+                                databaseRef.child(postId).child("picture").setValue(post.getPicture());
+                                databaseRef.child(postId).child("timestamp").setValue(post.getTimestamp());
+                                databaseRef.child(postId).child("userId").setValue(post.getUserId());
+                                databaseRef.child(postId).child("postId").setValue(postId);
+                                databaseRef.child(postId).child("username").setValue(post.getUsername());
+                                databaseRef.child(postId).child("profilePicture").setValue(post.getProfilePicture());
+
+                                Toast.makeText(PostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.d("FirebaseData", "No picture found for this user.");
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.w("FirebaseData", "loadPost:onCancelled", databaseError.toException());
+                            // Handle possible errors
+                        }
+                    });
 
 
-                    Toast.makeText(PostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(PostActivity.this, "User authentication is required", Toast.LENGTH_SHORT).show();
                 }

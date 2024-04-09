@@ -8,11 +8,12 @@ public class Post {
     private String userId;
     private String postId;
     private String username;
+    private String profilePicture;
 
     public Post() {
     }
 
-    public Post(String description, int likes, String picture, long timestamp, String userId,String postId, String username) {
+    public Post(String description, int likes, String picture, long timestamp, String userId,String postId, String username, String profilePicture) {
         this.description = description;
         this.likes = likes;
         this.picture = picture;
@@ -20,6 +21,7 @@ public class Post {
         this.userId = userId;
         this.postId = postId;
         this.username = username;
+        this.profilePicture = profilePicture;
     }
 
     public String getDescription() {
@@ -45,6 +47,7 @@ public class Post {
         return username;
     }
     public String getPostId() {return postId;}
+    public String getProfilePicture(){return profilePicture;}
 
     public void setDescription(String description) {
         this.description = description;
@@ -64,5 +67,8 @@ public class Post {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+    public void setPostId(String postId) {
+        this.postId = postId;
     }
 }

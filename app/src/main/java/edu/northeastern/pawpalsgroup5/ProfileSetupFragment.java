@@ -70,18 +70,17 @@ public class ProfileSetupFragment extends Fragment {
         profileImageView = view.findViewById(R.id.profileImageView);
 
         upload.setOnClickListener(v -> openGallery());
+
         btnSaveProfile.setOnClickListener(v -> {
+            String petName = petNameEditText.getText().toString().trim();
+            String breed = breedEditText.getText().toString().trim();
+            String age = ageEditText.getText().toString().trim();
+            String description = introductionEditText.getText().toString().trim();
+            if (petName.isEmpty() || breed.isEmpty() || age.isEmpty() || description.isEmpty()) {
+                Toast.makeText(requireContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if (selectedImage != null) {
-                String petName = petNameEditText.getText().toString().trim();
-                String breed = breedEditText.getText().toString().trim();
-                String age = ageEditText.getText().toString().trim();
-                String description = introductionEditText.getText().toString().trim();
-
-                if (petName.isEmpty() || breed.isEmpty() || age.isEmpty() || description.isEmpty()) {
-                    Toast.makeText(requireContext(), "Please fill in all fields.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
                 FirebaseStorage storage = FirebaseStorage.getInstance();
                 StorageReference storageRef = storage.getReference().child("profileImages/" + UUID.randomUUID().toString());
                 storageRef.putFile(selectedImage).addOnSuccessListener(taskSnapshot -> {
@@ -117,7 +116,37 @@ public class ProfileSetupFragment extends Fragment {
                     Toast.makeText(requireContext(), "Image upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
             } else {
-                Toast.makeText(requireContext(), "User authentication required", Toast.LENGTH_SHORT).show();
+                String userId = currentUser.getUid();
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users");
+                DatabaseReference pictureRef = databaseRef.child(userId).child("picture");
+                pictureRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // Check if there is a valid picture for the user
+                        if (dataSnapshot.exists()) {
+                            String pictureUrl = dataSnapshot.getValue(String.class);
+                            Log.d("pictureUrl", "pictureUrl: " + pictureUrl);
+                            // Create the user object with the image URL
+                            User user = new User(age, breed, description, petName, pictureUrl);
+                            databaseRef.child(userId).setValue(user)
+                                    .addOnSuccessListener(unused -> {
+                                        Toast.makeText(requireContext(), "Profile information saved successfully.", Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(requireContext(), MainActivity.class));
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(requireContext(), "Failed to save profile information: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                        } else {
+                            System.out.println("Profile Picture needed");
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.err.println("Error fetching picture: " + databaseError.getMessage());
+                    }
+                });
+
             }
         });
 

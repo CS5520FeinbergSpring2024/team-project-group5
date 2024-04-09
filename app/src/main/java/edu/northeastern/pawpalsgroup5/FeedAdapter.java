@@ -1,5 +1,7 @@
 package edu.northeastern.pawpalsgroup5;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +12,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -38,8 +46,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.descriptionTextView.setText(post.getDescription());
         holder.usernameTextView.setText(post.getUsername());
         holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
-        // handle image loading
-//        Glide.with(context).load(post.getPicture()).into(holder.profileImageView);
+        holder.usernameTextView.setText(post.getUsername());
+        holder.likeImageView.setImageResource(R.drawable.paw_white);
+        Picasso.get()
+                .load(post.getProfilePicture())
+                .into(holder.profileImageView);
+
+        Picasso.get()
+                .load(post.getPicture())
+                .into(holder.postImageView);
 
         holder.likeImageView.setOnClickListener(v -> {
             // Increment the like count in the model
@@ -55,6 +70,14 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
                 }
             });
         });
+
+        holder.chatImageView.setOnClickListener(v -> {
+            String postUserId = posts.get(position).getUserId();
+            String otherUserName = posts.get(position).getUsername();
+            String otherUserProfilePic = posts.get(position).getProfilePicture();
+
+            openChat(v.getContext(), postUserId, otherUserName, otherUserProfilePic);
+        });
     }
 
     @Override
@@ -62,8 +85,46 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         return posts.size();
     }
 
+    private void openChat(Context context, String postUserId, String otherUserName, String otherUserProfilePic) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        assert currentUser != null;
+        String currentUserId = currentUser.getUid();
+        DatabaseReference userChatsRef = FirebaseDatabase.getInstance().getReference("/userChats/");
+        String chatKey = postUserId.compareTo(currentUserId) > 0 ? currentUserId + "_" + postUserId : postUserId + "_" + currentUserId;
+
+        userChatsRef.child(chatKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String chatId;
+                if (!snapshot.exists()) {
+                    // chat does not exist, create a new one with chatId
+                    chatId = userChatsRef.push().getKey();
+                    userChatsRef.child(chatKey).setValue(chatId);
+                } else {
+                    chatId = snapshot.getValue(String.class);
+                }
+
+                // go to chat activity with this chatId
+                Intent intent = new Intent(context, Chat.class);
+                intent.putExtra("chatId", chatId);
+                intent.putExtra("otherUserId", postUserId);
+                intent.putExtra("otherUserName", otherUserName);
+                intent.putExtra("otherUserProfilePic", otherUserProfilePic);
+                context.startActivity(intent);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("FeedAdapter", "Failed to read chat ID.", error.toException());
+            }
+        });
+    }
+
+
     static class FeedViewHolder extends RecyclerView.ViewHolder {
         ImageView profileImageView;
+        ImageView postImageView;
         ImageView likeImageView;
         ImageView chatImageView;
         TextView numLikeTextView;
@@ -80,6 +141,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             numLikeTextView = itemView.findViewById(R.id.numLikeTextView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
             followImageView = itemView.findViewById(R.id.followImageView);
+            postImageView = itemView.findViewById(R.id.postImageView);
         }
     }
 }

@@ -9,6 +9,9 @@ public class Message {
     private String senderProfilePictureUrl;
 
 
+    public Message() {
+    }
+
     public Message(String senderId, String receiverId, String text, long timestamp) {
         this.senderId = senderId;
         this.receiverId = receiverId;

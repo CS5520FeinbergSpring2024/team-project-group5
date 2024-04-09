@@ -83,6 +83,16 @@
                 android:text="Introduction: unknown"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"/>
+            <TextView
+                android:id="@+id/postHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--- Post History ---"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_gravity="center"
+                android:layout_marginTop="8dp" />
+
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/postHistoryRecyclerView"
