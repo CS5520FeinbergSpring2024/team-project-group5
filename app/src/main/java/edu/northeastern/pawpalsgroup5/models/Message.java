@@ -4,6 +4,7 @@ public class Message {
     private String senderId;
     private String receiverId;
     private String text;
+    private String lastText;
     private long timestamp;
     private String senderName;
     private String senderProfilePictureUrl;
@@ -12,7 +13,7 @@ public class Message {
     public Message() {
     }
 
-    public Message(String senderId, String receiverId, String text, long timestamp) {
+    public Message(String senderId, String receiverId, String text, long timestamp, String senderName, String senderProfilePictureUrl ) {
         this.senderId = senderId;
         this.receiverId = receiverId;
         this.text = text;
@@ -66,5 +67,12 @@ public class Message {
 
     public void setSenderProfilePictureUrl(String senderProfilePictureUrl) {
         this.senderProfilePictureUrl = senderProfilePictureUrl;
+    }
+    public String getLastText() {
+        return lastText;
+    }
+
+    public void setLastText(String lastText) {
+        this.lastText = lastText;
     }
 }

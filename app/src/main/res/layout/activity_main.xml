@@ -16,13 +16,13 @@
 
     <ImageView
         android:id="@+id/chatHistoryButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="43dp"
+        android:layout_height="33dp"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        app:srcCompat="@drawable/chat"
-        android:contentDescription="@string/chat_history"/>
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:contentDescription="@string/chat_history"
+        app:srcCompat="@drawable/chat" />
 
     <FrameLayout
         android:id="@+id/fragment_container"
