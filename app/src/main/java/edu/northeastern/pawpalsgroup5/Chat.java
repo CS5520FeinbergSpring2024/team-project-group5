@@ -1,17 +1,17 @@
 package edu.northeastern.pawpalsgroup5;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import edu.northeastern.pawpalsgroup5.models.Message;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,12 +20,15 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import edu.northeastern.pawpalsgroup5.models.Message;
 
 public class Chat extends AppCompatActivity {
     private RecyclerView chatRecyclerView;
@@ -44,20 +47,31 @@ public class Chat extends AppCompatActivity {
 
         FirebaseAuth auth = FirebaseAuth.getInstance();
         currentUserId = Objects.requireNonNull(auth.getCurrentUser()).getUid();
-        // TODO: pass the chatId when starting this Chat activity using intent
         String chatId = getIntent().getStringExtra("chatId");
+        String otherUserName = getIntent().getStringExtra("otherUserName");
+        String otherUserProfilePicUrl = getIntent().getStringExtra("otherUserProfilePic");
 
-        chatMessagesRef = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages");
-
-        initializeUI();
-
-        loadMessages();
+        initializeUI(otherUserName, otherUserProfilePicUrl);
+        if (chatId != null) {
+            chatMessagesRef = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId).child("messages");
+            loadMessages();
+        }
     }
 
-    private void initializeUI() {
+    private void initializeUI(String otherUserName, String otherUserProfilePicUrl) {
         chatRecyclerView = findViewById(R.id.chatRecyclerView);
         messageInput = findViewById(R.id.messageInput);
         Button sendButton = findViewById(R.id.sendButton);
+
+        TextView userNameText = findViewById(R.id.userNameText);
+        ImageView userProfilePicture = findViewById(R.id.userProfilePicture);
+
+        userNameText.setText(otherUserName);
+        if (otherUserProfilePicUrl != null && !otherUserProfilePicUrl.isEmpty()) {
+            Picasso.get().load(otherUserProfilePicUrl).placeholder(R.drawable.user_default).into(userProfilePicture);
+        } else {
+            userProfilePicture.setImageResource(R.drawable.user_default);
+        }
 
         messageAdapter = new ChatMessageAdapter(messageList, currentUserId);
         chatRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -66,8 +80,9 @@ public class Chat extends AppCompatActivity {
         sendButton.setOnClickListener(v -> sendMessage());
     }
 
+
     private void sendMessage() {
-        String messageText = messageInput.getText().toString();
+        String messageText = messageInput.getText().toString().trim();
         if (!messageText.isEmpty()) {
             Map<String, Object> messageData = new HashMap<>();
             messageData.put("senderId", currentUserId);
