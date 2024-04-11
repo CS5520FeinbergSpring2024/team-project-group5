@@ -62,18 +62,18 @@
                 android:gravity="center_horizontal"
                 android:layout_marginTop="8dp">
 
-                <TextView
-                    android:id="@+id/followingCountTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Following: 0"
-                    android:layout_marginEnd="16dp"/>
+<!--                <TextView-->
+<!--                    android:id="@+id/followingCountTextView"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Following: 0"-->
+<!--                    android:layout_marginEnd="16dp"/>-->
 
-                <TextView
-                    android:id="@+id/followersCountTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Followers: 0"/>
+<!--                <TextView-->
+<!--                    android:id="@+id/followersCountTextView"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Followers: 0"/>-->
             </LinearLayout>
 
             <TextView
