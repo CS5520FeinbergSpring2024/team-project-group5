@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 selectedFragment = new FeedFragment();
 
             } else if (itemId == R.id.nav_following) {
-                selectedFragment = PlaceholderFragment.newInstance(2);
+                selectedFragment = new SpotlightFragment();
 
             } else if(itemId == R.id.nav_post) {
                 Intent intent = new Intent(MainActivity.this, PostActivity.class);
