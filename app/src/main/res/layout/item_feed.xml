@@ -21,17 +21,16 @@
         android:layout_marginStart="8dp"
         app:layout_constraintStart_toEndOf="@+id/profileImageView"
         app:layout_constraintTop_toTopOf="@+id/profileImageView"
-        app:layout_constraintBottom_toBottomOf="@+id/profileImageView"
-        app:layout_constraintEnd_toStartOf="@+id/followImageView" />
+        app:layout_constraintBottom_toBottomOf="@+id/profileImageView"  />
 
-    <ImageView
-        android:id="@+id/followImageView"
-        android:layout_width="20dp"
-        android:layout_height="30dp"
-        android:src="@drawable/plus"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/profileImageView"
-        android:contentDescription="@string/follow" />
+<!--    <ImageView-->
+<!--        android:id="@+id/followImageView"-->
+<!--        android:layout_width="20dp"-->
+<!--        android:layout_height="30dp"-->
+<!--        android:src="@drawable/plus"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="@+id/profileImageView"-->
+<!--        android:contentDescription="@string/follow" />-->
 
     <ImageView
         android:id="@+id/postImageView"

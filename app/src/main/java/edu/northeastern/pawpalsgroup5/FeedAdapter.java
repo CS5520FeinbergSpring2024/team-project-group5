@@ -146,7 +146,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView numLikeTextView;
         TextView usernameTextView;
         TextView descriptionTextView;
-        ImageView followImageView;
+//        ImageView followImageView;
         TextView timestampTextView;
 
         public FeedViewHolder(@NonNull View itemView) {
@@ -157,7 +157,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             numLikeTextView = itemView.findViewById(R.id.numLikeTextView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
-            followImageView = itemView.findViewById(R.id.followImageView);
+//            followImageView = itemView.findViewById(R.id.followImageView);
             postImageView = itemView.findViewById(R.id.postImageView);
             timestampTextView = itemView.findViewById(R.id.timestampTextView);
         }
