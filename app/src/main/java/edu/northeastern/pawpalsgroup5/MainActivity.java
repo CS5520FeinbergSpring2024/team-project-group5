@@ -2,16 +2,14 @@ package edu.northeastern.pawpalsgroup5;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
-
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,19 +25,6 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FeedFragment()).commit();
         }
-
-        // Find the chat history button by its ID
-        ImageView chatHistoryButton = findViewById(R.id.chatHistoryButton);
-
-        // Set an OnClickListener for the chat history button
-        chatHistoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Create an intent to start the ChatHistoryActivity
-                Intent intent = new Intent(MainActivity.this, ChatHistoryActivity.class); // Modified to ChatHistoryActivity
-                startActivity(intent);
-            }
-        });
     }
 
     private final NavigationBarView.OnItemSelectedListener navListener = new NavigationBarView.OnItemSelectedListener() {
