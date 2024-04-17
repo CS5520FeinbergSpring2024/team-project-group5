@@ -167,6 +167,9 @@ public class PostActivity extends AppCompatActivity {
                                 databaseRef.child(postId).child("profilePicture").setValue(post.getProfilePicture());
 
                                 Toast.makeText(PostActivity.this, "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(PostActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
                             } else {
                                 Log.d("FirebaseData", "No picture found for this user.");
                             }
