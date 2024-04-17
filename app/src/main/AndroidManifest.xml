@@ -35,7 +35,7 @@
             android:exported="false" />
         <activity
             android:name=".ChatHistoryActivity"
-            android:exported="false" />
+            android:exported="true" />
 
         <activity
             android:name=".Login"
