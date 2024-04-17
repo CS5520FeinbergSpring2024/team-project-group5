@@ -8,7 +8,7 @@
     <string name="register">Register</string>
     <string name="join_pawpals_now">Join PawPals now!</string>
     <string name="home">Home</string>
-    <string name="following">Following</string>
+    <string name="spotlight">Spotlight</string>
     <string name="post">Post</string>
     <string name="me">Me</string>
     <string name="settings">Settings</string>
@@ -27,5 +27,7 @@
     <string name="sent_message">Sent message</string>
     <string name="timestamp">Timestamp</string>
     <string name="received_message">Received message</string>
-
+    <string name="channel_name">Chat Notifications</string>
+    <string name="channel_description">Notifications for new chat messages</string>
+    <string name="notification_icon_desc">Notification icon</string>
 </resources>

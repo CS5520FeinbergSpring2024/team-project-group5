@@ -54,17 +54,23 @@ public class ProfileFragment extends Fragment {
         recyclerView.setAdapter(adaptor);
 
         profileImageView = view.findViewById(R.id.profileImageView);
-        fetchUserInfoAndPopulateUI(view);
 
-        loadPosts();
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("userId")) {
+            String userId = args.getString("userId");
+            fetchUserInfoAndPopulateUI(view, userId);
+            loadPosts(userId);
+        } else {
+            fetchUserInfoAndPopulateUI(view, currentUserId);
+            loadPosts(currentUserId);
+        }
+
         return view;
     }
 
-    public void fetchUserInfoAndPopulateUI(final View view) {
+    public void fetchUserInfoAndPopulateUI(final View view, String userId) {
         if (currentUser != null) {
-            String userId = currentUser.getUid();
             DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
-
             databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
                 @Override
@@ -77,9 +83,9 @@ public class ProfileFragment extends Fragment {
                         String picture = dataSnapshot.child("picture").getValue(String.class);
 
                         ((TextView) view.findViewById(R.id.usernameTextView)).setText(petName);
-                        ((TextView) view.findViewById(R.id.BreedTextView)).setText(breed);
-                        ((TextView) view.findViewById(R.id.AgeTextView)).setText(age);
-                        ((TextView) view.findViewById(R.id.introTextView)).setText(description);
+                        ((TextView) view.findViewById(R.id.BreedTextView)).setText("Breed: " + breed);
+                        ((TextView) view.findViewById(R.id.AgeTextView)).setText("Age: " + age);
+                        ((TextView) view.findViewById(R.id.introTextView)).setText("Description: " + description);
                         Picasso.get()
                                 .load(picture)
                                 .into(profileImageView);
@@ -95,7 +101,7 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void loadPosts() {
+    private void loadPosts(String currentUserId) {
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference("posts");
         if (currentUser == null) {
             Log.e("FeedFragment", "User not found");

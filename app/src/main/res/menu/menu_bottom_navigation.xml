@@ -4,9 +4,9 @@
         android:icon="@android:drawable/ic_menu_view"
         android:title="@string/home" />
     <item
-        android:id="@+id/nav_following"
+        android:id="@+id/nav_spotlight"
         android:icon="@android:drawable/ic_menu_compass"
-        android:title="@string/following" />
+        android:title="@string/spotlight" />
     <item
         android:id="@+id/nav_post"
         android:icon="@android:drawable/ic_menu_add"

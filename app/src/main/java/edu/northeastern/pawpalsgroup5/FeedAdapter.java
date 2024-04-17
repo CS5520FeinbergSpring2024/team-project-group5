@@ -2,6 +2,7 @@ package edu.northeastern.pawpalsgroup5;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import edu.northeastern.pawpalsgroup5.models.Post;
@@ -48,6 +53,11 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
         holder.usernameTextView.setText(post.getUsername());
         holder.likeImageView.setImageResource(R.drawable.paw_white);
+        long timestamp = post.getTimestamp();
+        ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
+
+        holder.timestampTextView.setText(dateTime.format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
+
         Picasso.get()
                 .load(post.getProfilePicture())
                 .into(holder.profileImageView);
@@ -60,7 +70,6 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             // Increment the like count in the model
             post.setLikes(post.getLikes() + 1);
             holder.numLikeTextView.setText(String.format("%d likes", post.getLikes()));
-            holder.likeImageView.setImageResource(R.drawable.paw_black);
             // Update the like count in Firebase
             DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("posts").child(post.getPostId());
             postRef.child("likes").setValue(post.getLikes()).addOnCompleteListener(task -> {
@@ -77,6 +86,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             String otherUserProfilePic = posts.get(position).getProfilePicture();
 
             openChat(v.getContext(), postUserId, otherUserName, otherUserProfilePic);
+        });
+
+        holder.profileImageView.setOnClickListener(v -> {
+            Context context = v.getContext();
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).switchToProfileFragment(post.getUserId());
+            }
         });
     }
 
@@ -130,7 +146,8 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
         TextView numLikeTextView;
         TextView usernameTextView;
         TextView descriptionTextView;
-        ImageView followImageView;
+//        ImageView followImageView;
+        TextView timestampTextView;
 
         public FeedViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -140,8 +157,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.FeedViewHolder
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             numLikeTextView = itemView.findViewById(R.id.numLikeTextView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
-            followImageView = itemView.findViewById(R.id.followImageView);
+//            followImageView = itemView.findViewById(R.id.followImageView);
             postImageView = itemView.findViewById(R.id.postImageView);
+            timestampTextView = itemView.findViewById(R.id.timestampTextView);
         }
+
     }
 }
